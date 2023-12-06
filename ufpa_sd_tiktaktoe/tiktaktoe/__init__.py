@@ -29,6 +29,7 @@ class Game:
 
         queue_p2 = f'P2_{self.__uuid}'
         print(f'New Game {self.__uuid}')
+        print('You are (X)')
         consumer = RabbitmqConsumer(queue_p2, self.__get_state)
         consumer.start()
 
@@ -42,6 +43,7 @@ class Game:
         queue_p1 = f'P1_{self.__uuid}'
         consumer = RabbitmqConsumer(queue_p1, self.__get_state)
         print(f'Joined in Game {uuid}')
+        print('You are (O)')
         consumer.start()
 
     def __opponent_observer(self):
@@ -68,18 +70,47 @@ class Game:
         game_state = json.loads(body)
         self.__game_state['positions'] = game_state['positions']
         ch.stop_consuming()
+        has_won = self.__has_won()
+        if self.__has_won():
+            print(f'{has_won} Venceu!!!')
+            self.__print_positions()
+            self.__close_game()
 
-    def __has_winner(self, game_positions: list):
+    def __close_game(self):
+        """
+        Encerra a aplicação
+        """
+        self.__game_state['state'] = 'has_won'
+        self.__set_state()
+        exit(0)
+
+    def __print_positions(self):
+        game_positions = self.__game_state['positions']
+        for row in range(3):
+            for collumn in range(3):
+                if game_positions[row][collumn] == None:
+                    game_positions[row][collumn] = ' '
+                
+        print(*game_positions,sep='\n')
+
+    def __has_won(self):
         """
         Verifica se há um vencedor no momento, e casos exista, retorna-o.
         """
+        game_positions = [_ for _ in self.__game_state['positions']]
+
+        for row in range(3):
+            for collumn in range(3):
+                if game_positions[row][collumn] == ' ':
+                    game_positions[row][collumn] = None
+
         for row in game_positions:
-            if row.count('o') == 3:
+            if row.count('O') == 3:
                 # linha
-                return 'o'
-            elif row.count('x') == 3:
+                return 'O'
+            elif row.count('X') == 3:
                 # linha
-                return 'x'
+                return 'X'
 
         for collumn in range(3):
             if (
@@ -107,14 +138,19 @@ class Game:
         ):
             # diagonal secundaria
             return game_positions[0][2]
+        return False
 
     def loop(self):
+        """
+        Loop principal. Onde as entradas são obtidas.
+        """
         while True:
-            [print(_) for _ in self.__game_state['positions']]
+            self.__print_positions()
             x, y = map(int, input('entrada de coordenada: ').split(','))
 
             character = 'X' if self.__game_state['player'] == 'P1' else 'O'
             self.__game_state['positions'][x][y] = character
+
             self.__set_state()
             print('Esperando jogada do oponente...')
             self.__opponent_observer()
