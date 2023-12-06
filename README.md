@@ -24,6 +24,18 @@ Para responder melhor, vamos precisar discorrer sobre dois outros assuntos.
 
 ## :rocket: Como rodar o projeto
 
+**Instalação de dependencias**
+
 ```
-docker compose up
+pip install -r requirements.txt
+```
+
+Player 1
+```
+python ufpa_sd_tiktaktoe -c
+```
+
+Player 2
+```
+python ufpa_sd_tiktaktoe -j <uuid>
 ```
