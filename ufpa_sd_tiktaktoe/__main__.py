@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     if args.create:
         game.new()
-        game.loop('new_game')
     else:
         game.join(args.join)
-        game.loop('join_game')
+
+    game.loop()
