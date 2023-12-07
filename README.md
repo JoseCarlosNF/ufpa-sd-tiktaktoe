@@ -24,23 +24,22 @@ Para responder melhor, vamos precisar discorrer sobre dois outros assuntos.
 
 ## :rocket: Como rodar o projeto
 
-**Instalação de dependencias**
-
+Constrói a imagem docker:
 ```
-pip install -r requirements.txt
-```
-
-Player 1
-```
-python ufpa_sd_tiktaktoe -c
+make build
 ```
 
-Player 2
+Cria uma partida:
 ```
-python ufpa_sd_tiktaktoe -j <uuid>
+make create
 ```
 
-## Exemplo de execução
+Entra em uma partida
+```
+make joind UUID=88974a12-9a1a-4c53-9bc9-0c74d7ce49bf
+```
+
+## :test_tube: Exemplo de execução
 
 Player 1
 ```
