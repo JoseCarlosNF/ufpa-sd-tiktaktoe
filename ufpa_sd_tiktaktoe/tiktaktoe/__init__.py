@@ -23,11 +23,11 @@ class Game:
         self.__uuid = str(uuid4())
         self.__game_state = GameState(player='P1').__dict__
 
-        queue_p1 = f'{self.__game_state["player"]}_{self.__uuid}'
+        queue_p1 = f'{self.__uuid}_P1'
         publisher = RabbitmqPublisher(queue_p1)
         publisher.send_message(self.__game_state)
 
-        queue_p2 = f'P2_{self.__uuid}'
+        queue_p2 = f'{self.__uuid}_P2'
         print(f'New Game {self.__uuid}')
         print('You are (X)')
         consumer = RabbitmqConsumer(queue_p2, self.__get_state)
@@ -40,7 +40,7 @@ class Game:
         self.__uuid = uuid
         self.__game_state = GameState(player='P2').__dict__
 
-        queue_p1 = f'P1_{self.__uuid}'
+        queue_p1 = f'{self.__uuid}_P1'
         consumer = RabbitmqConsumer(queue_p1, self.__get_state)
         print(f'Joined in Game {uuid}')
         print('You are (O)')
@@ -51,7 +51,7 @@ class Game:
         Observa a fila do oponente, a esperada de jogadas.
         """
         opponent_player = 'P2' if self.__game_state['player'] == 'P1' else 'P1'
-        queue = f'{opponent_player}_{self.__uuid}'
+        queue = f'{self.__uuid}_{opponent_player}'
         consumer = RabbitmqConsumer(queue, self.__get_state)
         consumer.start()
 
@@ -59,7 +59,7 @@ class Game:
         """
         Publica na fila do player, as posições do estado atual.
         """
-        queue = f'{self.__game_state["player"]}_{self.__uuid}'
+        queue = f'{self.__uuid}_{self.__game_state["player"]}'
         publisher = RabbitmqPublisher(queue)
         publisher.send_message(self.__game_state)
 
