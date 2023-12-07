@@ -1,0 +1,14 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.12.10-management
+    ports:
+      - 8080:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=bugs
+      - RABBITMQ_DEFAULT_PASS=bunny
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 2s
+      timeout: 5s
+      retries: 3
